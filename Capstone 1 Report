@@ -92,6 +92,19 @@ Average deviation from season fantasy score average on the road: -0.440
 
 Again, not a surprising result, but I wanted to confirm in with another t-test. The resulting t statistic was 29.256 with another extremely small p-value of 5.95E-188. The null hypothesis is rejected with nearly 100% certainty and home court advantage does in fact appear to exist.
 
+## Modeling
+
+After acquiring, cleaning, and exploring the data, the next step is to find an appropriate model for the data. Since we are trying to predict the fantasy score of a player for a given night, several different regression techniques were examined including ridge, lasso, decision trees and random forest. I was also curious about the data's ability to predict whether or not a player would perform better or worse than his season average to date. While the regression method would help the client set lines for betting, the logistic model could help the user in setting lineups and placing bets. All of the models and code can be found in the [Models Notebook](https://github.com/KaanME/NBA-Fantasy-Score-Predictor/blob/master/Models.ipynb).
+
+### Data Pre-Processing and Feature Selection
+
+Before we can actually fit the data to a model, there are a few steps to be performed to pre-process the data, as well as a couple more wrangling steps. The data in the exploration looked at season averages for the most part, but our goal is to predict game by game. The last 3 games of a player might be a better indicator of how they are going to perform compared to the season average. Therefore, I looked at how different windows of statistical averages affected the prediction of the current game. That is, I created separate datasets that looked at only the game before, the average stats of the the last 3 games, as well as the last 5, 7, 10, 15, and 20 games. 
+
+In order for our models to provide us with valuable information, the data also had to be scaled. This was accomplished through the use of sklearn's StandardScaler function. From there, the appropriate features need to be selected. The dataset consists of over 40 features, and  in order to save on computation time and the ill effects of multi-colinearity, I wanted to bring that number down to 10. 
+I chose to use manually selected features based on my the data exporation as well as use the SelectKBest algorithm in sklearn and compare the results for each. The features I selected come from the variable that make up the fantasy score, the strong correlation between fantasy score and minutes played, as well as the opponents defense, the teams pace, and whether or not they played at home.
+
+![equation]('mp_l5', 'pts_l5', 'ast_l5', 'reb_l5', 'stl_l5', 'blk_l5', 'tov_l5', 'fg3m_l5', 'opp_def_eff_l5', 'tm_pace_l5', 'home')
+
 ## Limitations
 
 There are a lot of events during the course of an NBA season, and even just during the course of one game, that can affect the statistical performance of a player. A few of the limitations of the data here is that we do not know the positional matchups, or individual defensive ability of the opponent players. A great defensive team could have 1 player that is not so great on that side of ball, and the team playing them could have their best scorer playing the same position. Even though players generally play worse against good defenses, that particular matchup could be exploited. Another limitation of the data is that we do not have any injury information. A player that is out with a minor injury will come back to the court with minimal ill effects to his game. A player coming back from knee surgery could suffer greatly in performance, and we wouldn't be able to capture accurate projections when he returns. Coaching, team chemistry, trades, and a multitude of other variables exist in the real world, but we will stick to what we can extract from the box scores.
