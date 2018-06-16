@@ -101,9 +101,34 @@ After acquiring, cleaning, and exploring the data, the next step is to find an a
 Before we can actually fit the data to a model, there are a few steps to be performed to pre-process the data, as well as a couple more wrangling steps. The data in the exploration looked at season averages for the most part, but our goal is to predict game by game. The last 3 games of a player might be a better indicator of how they are going to perform compared to the season average. Therefore, I looked at how different windows of statistical averages affected the prediction of the current game. That is, I created separate datasets that looked at only the game before, the average stats of the the last 3 games, as well as the last 5, 7, 10, 15, and 20 games. 
 
 In order for our models to provide us with valuable information, the data also had to be scaled. This was accomplished through the use of sklearn's StandardScaler function. From there, the appropriate features need to be selected. The dataset consists of over 40 features, and  in order to save on computation time and the ill effects of multi-colinearity, I wanted to bring that number down to 10. 
-I chose to use manually selected features based on my the data exporation as well as use the SelectKBest algorithm in sklearn and compare the results for each. The features I selected come from the variable that make up the fantasy score, the strong correlation between fantasy score and minutes played, as well as the opponents defense, the teams pace, and whether or not they played at home.
+I chose to use manually selected features based on my the data exporation as well as use the SelectKBest algorithm in sklearn and compare the results for each. The features I selected come from the variable that make up the fantasy score, the strong correlation between fantasy score and minutes played, as well as the opponents defense, the teams pace, and whether or not they played at home. The following table shows the features for the data using the avergae stats of the last 5 games, the 5 will change to correspond to the number of games being looked at. 
 
-![equation]('mp_l5', 'pts_l5', 'ast_l5', 'reb_l5', 'stl_l5', 'blk_l5', 'tov_l5', 'fg3m_l5', 'opp_def_eff_l5', 'tm_pace_l5', 'home')
+<table border="1" class="dataframe"> <thead> <tr style="text-align: center;">
+ <th></th> <th>fts_picked</th> </tr> </thead> <tbody> 
+ <tr> <th>0</th> <td>mp_l5</td> </tr> 
+ <tr> <th>1</th> <td>pts_l5</td> </tr> 
+ <tr> <th>2</th> <td>ast_l5</td> </tr> 
+ <tr> <th>3</th> <td>reb_l5</td> </tr> 
+ <tr> <th>4</th> <td>stl_l5</td> </tr> 
+ <tr> <th>5</th> <td>blk_l5</td> </tr> 
+ <tr> <th>6</th> <td>tov_l5</td> </tr> 
+ <tr> <th>7</th> <td>fg3m_l5</td> </tr> 
+ <tr> <th>8</th> <td>opp_def_eff_l5</td> </tr> 
+ <tr> <th>9</th> <td>tm_pace_l5</td> </tr> 
+ <tr> <th>10</th> <td>home</td> </tr> </tbody> </table>
+
+I also applied the SelectKBest algorithm to each of the datasets to get features that have the highest F-statistic, using sklearn's f_regression scoring method. I looped through each dataset and found the best 10 features for each, shown in the table below:
+
+<table border="1" class="dataframe"> <thead>   <tr style="text-align: right;">   <th></th>   <th>1</th>   <th>3</th>   <th>5</th>   <th>7</th>   <th>10</th>   <th>15</th>   <th>20</th>   </tr> </thead> <tbody>   <tr>   <th>0</th>   <td>fscore_exp</td>   <td>fscore_exp</td>   <td>fscore_exp</td>   <td>fscore_exp</td>   <td>fscore_exp</td>   <td>fscore_exp</td>   <td>fscore_exp</td>   </tr>   <tr>   <th>1</th>   <td>mp_l1</td>   <td>mp_l3</td>   <td>mp_l5</td>   <td>mp_l7</td>   <td>mp_l10</td>   <td>mp_l15</td>   <td>mp_l20</td>   </tr>   <tr>   <th>2</th>   <td>fgm_l1</td>   <td>fgm_l3</td>   <td>fgm_l5</td>   <td>fgm_l7</td>   <td>fgm_l10</td>   <td>fgm_l15</td>   <td>fgm_l20</td>   </tr>   <tr>   <th>3</th>   <td>fga_l1</td>   <td>fga_l3</td>   <td>fga_l5</td>   <td>fga_l7</td>   <td>fga_l10</td>   <td>fga_l15</td>   <td>fga_l20</td>   </tr>   <tr>   <th>4</th>   <td>ftm_l1</td>   <td>ftm_l3</td>   <td>ftm_l5</td>   <td>ftm_l7</td>   <td>ftm_l10</td>   <td>ftm_l15</td>   <td>ftm_l20</td>   </tr>   <tr>   <th>5</th>   <td>fta_l1</td>   <td>fta_l3</td>   <td>fta_l5</td>   <td>fta_l7</td>   <td>fta_l10</td>   <td>fta_l15</td>   <td>fta_l20</td>   </tr>   <tr>   <th>6</th>   <td>dreb_l1</td>   <td>dreb_l3</td>   <td>dreb_l5</td>   <td>dreb_l7</td>   <td>ft_pct_l10</td>   <td>ft_pct_l15</td>   <td>ft_pct_l20</td>   </tr>   <tr>   <th>7</th>   <td>reb_l1</td>   <td>tov_l3</td>   <td>tov_l5</td>   <td>tov_l7</td>   <td>tov_l10</td>   <td>tov_l15</td>   <td>tov_l20</td>   </tr>   <tr>   <th>8</th>   <td>pts_l1</td>   <td>pts_l3</td>   <td>pts_l5</td>   <td>pts_l7</td>   <td>pts_l10</td>   <td>pts_l15</td>   <td>pts_l20</td>   </tr>   <tr>   <th>9</th>   <td>fscore_l1</td>   <td>fscore_l3</td>   <td>fscore_l5</td>   <td>fscore_l7</td>   <td>fscore_l10</td>   <td>fscore_l15</td>   <td>fscore_l20</td>   </tr> </tbody> </table>
+
+The table shows that the top 10 features are pretty much the same for each different number of games. When the number of games swtiches from 7 to 10, defensive rebounds (dreb_) is replaced with free throw percentage (ft_pct_), other than that the features are all identical. The number of field goals and free throws attempted and made are all selected features, along with the average fantasy score leading up to the game, and minutes, points and turnovers as well. To clarify, fscore_exp is the expanding average fantasy score for each player resetting at the beginning of each season. 
+
+The 2017-18 season will be left out as the test set and the target variable will the fantasy score (fscore).
+
+### Comparing Regression Models
+
+Now that we've selected our features and scaled our values, we can start testing out different regression models to see which one performs best. Since we are looking at 7 different datasets, the goal is to first find the number of matches that provides the best estimate. Then tune the parameters of the best model to get the best results. The scoring method to be used will be the mean squared error regression loss. Squaring the mean squared error will give us the average number of points the model is off by compared to the actual values. 
+
 
 ## Limitations
 
